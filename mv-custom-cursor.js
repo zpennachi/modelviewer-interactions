@@ -1,11 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const mvAnimationViewer = document.querySelector('#hover-trigger');
+    // Find the container with the cursor-element attribute set to "embed"
+    const embedContainer = document.querySelector('[cursor-element="embed"]');
+    // Find the model-viewer element within this container
+    const mvAnimationViewer = embedContainer ? embedContainer.querySelector('model-viewer') : null;
+
+    if (!mvAnimationViewer) {
+        console.error('No model-viewer found within an element with cursor-element="embed".');
+        return; // Exit the script if model-viewer isn't found
+    }
+
     let animationAllowed = true; // Flag to control animation starts
 
-    // Function to start a specific animation based on its order (index)
     function startAnimationByIndex(animationIndex) {
         if (animationAllowed && !mvAnimationViewer.hasAttribute('data-playing')) {
-            // Assuming animations are an array-like structure within mvAnimationViewer
             if(animationIndex < mvAnimationViewer.availableAnimations.length) {
                 mvAnimationViewer.animationName = mvAnimationViewer.availableAnimations[animationIndex];
                 console.log(`Starting animation by index:`, mvAnimationViewer.availableAnimations[animationIndex]);
@@ -28,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleMouseEnter(value) {
-        // Assuming value is in the format "hover-x"
         const [type, id] = value.split('-');
         if (type === 'hover' && animationAllowed) {
             const animationIndex = parseInt(id, 10) - 1; // Convert to zero-based index
@@ -36,13 +42,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Enhanced mouse leave handler to ensure cleanup and readiness for next animation
     function enhancedMouseLeave() {
         stopAndResetAnimation();
         setTimeout(() => animationAllowed = true, 100); // Short delay to manage quick transitions
     }
 
-    // Utility function to disable pointer events for specified cursor elements
     function disablePointerEventsForCursorElements() {
         document.querySelectorAll('[cursor-element="cursor"], [cursor-element="embed"], [cursor-element="wrapper"]').forEach(element => {
             element.style.pointerEvents = 'none';
