@@ -23,10 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         animationAllowed = true; // Allow animations to start again
     }
 
-    // Generic function to handle mouse enter
-    function handleMouseEnter(elementClass) {
-        // Extract animation order from class name (e.g., "hover-1" -> 1)
-        const animationOrder = elementClass.split('-')[1];
+    // Generic function to handle mouse enter based on cursor-element attribute value
+    function handleMouseEnter(animationOrder) {
         if (animationAllowed) {
             startAnimation(animationOrder);
         }
@@ -38,12 +36,12 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => animationAllowed = true, 100); // Short delay to manage quick transitions
     }
 
-    // Dynamic event listeners binding for all hover elements
-    document.querySelectorAll('[class*="hover-"]').forEach(btn => {
-        const elementClass = btn.className.split(' ').find(className => className.startsWith('hover-'));
-        if (elementClass) {
-            btn.addEventListener('mouseenter', () => handleMouseEnter(elementClass));
-            btn.addEventListener('mouseleave', enhancedMouseLeave);
+    // Dynamic event listeners binding for all elements with cursor-element attribute
+    document.querySelectorAll('[cursor-element]').forEach(element => {
+        const animationOrder = element.getAttribute('cursor-element').split('-')[1];
+        if (animationOrder) {
+            element.addEventListener('mouseenter', () => handleMouseEnter(animationOrder));
+            element.addEventListener('mouseleave', enhancedMouseLeave);
         }
     });
 
@@ -52,3 +50,4 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Model Viewer Loaded.');
     });
 });
+
