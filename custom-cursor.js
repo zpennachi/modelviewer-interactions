@@ -2,16 +2,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const mvAnimationViewer = document.querySelector('#hover-trigger');
     let animationAllowed = true; // Flag to control animation starts
 
-    // Function to start a specific animation based on its identifier
-    function startAnimation(animationId) {
+    // Function to start a specific animation based on its order (index)
+    function startAnimationByIndex(animationIndex) {
         if (animationAllowed && !mvAnimationViewer.hasAttribute('data-playing')) {
-            const animationName = `animation ${animationId}`; // Use the identifier directly for the animation name
-            console.log('Starting animation:', animationName);
-            mvAnimationViewer.animationName = animationName;
-            mvAnimationViewer.currentTime = 0;
-            mvAnimationViewer.play({repetitions: 1});
-            mvAnimationViewer.setAttribute('data-playing', 'true');
-            animationAllowed = false; // Prevent new animations from starting
+            // Assuming animations are an array-like structure within mvAnimationViewer
+            if(animationIndex < mvAnimationViewer.availableAnimations.length) {
+                mvAnimationViewer.animationName = mvAnimationViewer.availableAnimations[animationIndex];
+                console.log(`Starting animation by index:`, mvAnimationViewer.availableAnimations[animationIndex]);
+                mvAnimationViewer.currentTime = 0;
+                mvAnimationViewer.play({repetitions: 1});
+                mvAnimationViewer.setAttribute('data-playing', 'true');
+                animationAllowed = false; // Prevent new animations from starting
+            } else {
+                console.error("Animation index out of bounds:", animationIndex);
+            }
         }
     }
 
@@ -23,14 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
         animationAllowed = true; // Allow animations to start again
     }
 
-    // Generic function to handle mouse enter based on cursor-element attribute value
     function handleMouseEnter(value) {
-        // Parse the value to determine the action; for now, we focus on hover triggers
+        // Assuming value is in the format "hover-x"
         const [type, id] = value.split('-');
         if (type === 'hover' && animationAllowed) {
-            startAnimation(id);
+            const animationIndex = parseInt(id, 10) - 1; // Convert to zero-based index
+            startAnimationByIndex(animationIndex);
         }
-        // Future case handling can go here, e.g., if (type === 'cursor') { ... }
     }
 
     // Enhanced mouse leave handler to ensure cleanup and readiness for next animation
@@ -46,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
             element.addEventListener('mouseenter', () => handleMouseEnter(attributeValue));
             element.addEventListener('mouseleave', enhancedMouseLeave);
         }
-        // Future bindings for other cursor-related elements can be added here
     });
 
     // Handling model viewer load event
